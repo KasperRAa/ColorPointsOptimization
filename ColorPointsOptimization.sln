@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36221.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColorPointsOptimization_Library", "ColorPointsOptimization_Library\ColorPointsOptimization_Library.csproj", "{C4D1992C-1E82-4C0E-9203-15AD15A68B57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ColorPointsOptimization_WindowsForms", "ColorPointsOptimization_WindowsForms\ColorPointsOptimization_WindowsForms.csproj", "{28DF35FE-F022-B481-7647-4A06ACE22CB6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C4D1992C-1E82-4C0E-9203-15AD15A68B57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4D1992C-1E82-4C0E-9203-15AD15A68B57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4D1992C-1E82-4C0E-9203-15AD15A68B57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4D1992C-1E82-4C0E-9203-15AD15A68B57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28DF35FE-F022-B481-7647-4A06ACE22CB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28DF35FE-F022-B481-7647-4A06ACE22CB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28DF35FE-F022-B481-7647-4A06ACE22CB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28DF35FE-F022-B481-7647-4A06ACE22CB6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E9DD9159-638A-44DF-B7CC-A7492218B6C5}
+	EndGlobalSection
+EndGlobal
