@@ -13,7 +13,7 @@ namespace ColorPointsOptimization_Library
     public class ColorPointsContainer
     {
         protected Accelerator _accelerator;
-        protected Action<Index1D, ArrayView<PointF>, ArrayView<Vector2>, SizeF, float> _kernel_TakeStep;
+        protected Action<Index1D, ArrayView<PointF>, ArrayView<Vector2>, SizeF, float, float> _kernel_TakeStep;
 
         public PointF Position { get; set; }
         public SizeF Size { get; set; }
@@ -22,6 +22,7 @@ namespace ColorPointsOptimization_Library
         protected int[] _colors { get; set; }//ARGB is an integer
         protected PointF[] _points { get; set; }
         protected Vector2[] _velocities { get; set; }
+        protected float _speedFactor;
 
         public ColorPointsContainer(float x, float y, float width, float height, int colorPointCount, float speedFactor) : this(new PointF(x, y), new SizeF(width, height), colorPointCount, speedFactor) { }
         public ColorPointsContainer(RectangleF container, int colorPointCount, float speedFactor) : this(container.Location, container.Size, colorPointCount, speedFactor) { }
@@ -45,12 +46,14 @@ namespace ColorPointsOptimization_Library
                 _points[i].X = rng.Next(0, (int)Size.Width);
                 _points[i].Y = rng.Next(0, (int)Size.Height);
                 _velocities[i] = new Vector2((float)rng.NextDouble() - 0.5f, (float)rng.NextDouble() - 0.5f);
-                _velocities[i] = Vector2.Normalize(_velocities[i]) * speedFactor;
+                _velocities[i] = Vector2.Normalize(_velocities[i]);
             }
 
             Context context = Context.CreateDefault();
             _accelerator = context.GetPreferredDevice(false).CreateAccelerator(context);
-            _kernel_TakeStep = _accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<PointF>, ArrayView<Vector2>, SizeF, float>(AddKernel_TakeStep);
+            _kernel_TakeStep = _accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<PointF>, ArrayView<Vector2>, SizeF, float, float>(AddKernel_TakeStep);
+
+            _speedFactor = speedFactor;
         }
 
         public void TakeStep(float deltaTime)
@@ -58,20 +61,20 @@ namespace ColorPointsOptimization_Library
             using var devicePoints = _accelerator.Allocate1D(_points);
             using var deviceVelocities = _accelerator.Allocate1D(_velocities);
 
-            _kernel_TakeStep(_count, devicePoints.View, deviceVelocities.View, Size, deltaTime);
+            _kernel_TakeStep(_count, devicePoints.View, deviceVelocities.View, Size, _speedFactor, deltaTime);
 
             devicePoints.CopyToCPU(_points);
             deviceVelocities.CopyToCPU(_velocities);
         }
 
         #region Kernels
-        private static void AddKernel_TakeStep(Index1D i, ArrayView<PointF> points, ArrayView<Vector2> velocities, SizeF size, float deltaTime)
+        private static void AddKernel_TakeStep(Index1D i, ArrayView<PointF> points, ArrayView<Vector2> velocities, SizeF size, float speedFactor, float deltaTime)
         {
             PointF pos = points[i];
             Vector2 vel = velocities[i];
 
-            float deltaX = vel.X * deltaTime;
-            float deltaY = vel.Y * deltaTime;
+            float deltaX = vel.X * deltaTime * speedFactor;
+            float deltaY = vel.Y * deltaTime * speedFactor;
 
             pos.X += deltaX;
             pos.Y += deltaY;

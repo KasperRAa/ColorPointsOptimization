@@ -25,8 +25,9 @@ namespace ColorPointsOptimization_WindowsForms
         {
             int width = (int)Size.Width;
             int height = (int)Size.Height;
-            int[] nearestColor = new int[width * height];
-            Stopwatch sw = Stopwatch.StartNew();
+            int area = width * height;
+            int[] nearestColor = new int[area];
+            Stopwatch sw = Stopwatch.StartNew();//
             var index = new Index2D(width, height);
             using var devicePoints = _accelerator.Allocate1D(_points);
             using var deviceColors = _accelerator.Allocate1D(_colors);

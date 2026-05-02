@@ -21,9 +21,8 @@ namespace ColorPointsOptimization
         private bool _isLoaded;
 
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]//Asked AI for a way to keep the screen from slumbering
         static extern uint SetThreadExecutionState(uint esFlags);
-
         // Flags to keep the screen and system awake
         const uint ES_CONTINUOUS = 0x80000000;
         const uint ES_SYSTEM_REQUIRED = 0x00000001;
@@ -37,8 +36,6 @@ namespace ColorPointsOptimization
             FormBorderStyle = FormBorderStyle.None;
             // Fill the screen
             WindowState = FormWindowState.Maximized;
-            //// Keep it on top of the taskbar
-            //TopMost = true;
 
             DoubleBuffered = true;
             Application.Idle += HandleRendering;
@@ -79,19 +76,21 @@ namespace ColorPointsOptimization
         }
 
         Queue<long> frameDurations = new Queue<long>();
-        bool display;
+        bool display = true;
         protected override void OnPaint(PaintEventArgs e)
         {
             if (!_isLoaded) return;
 
+            Stopwatch sw = Stopwatch.StartNew();
             _colorPointContainer.TakeStep(1);
+            long msSimulation = sw.ElapsedMilliseconds;
 
             Graphics g = e.Graphics;
             var borders = g.ClipBounds;
 
             #region Drawing
             long msAllocate; long msLoadTo; long msExecute; long msLoadFrom;
-            Stopwatch sw = Stopwatch.StartNew();
+            sw.Restart();
             var colors = _colorPointContainer.CalculateColors(out msAllocate, out msLoadTo, out msExecute, out msLoadFrom);
             long msCalculateColors = sw.ElapsedMilliseconds;
             var bitmap = ArrayToBitmap(colors, (int)borders.Width, (int)borders.Height);
@@ -108,18 +107,20 @@ namespace ColorPointsOptimization
                 string str;
                 g.FillRectangle(Brushes.White, new Rectangle(0, 0, (int)borders.Width, Font.Height * 4));
                 str = $"Framrate: {framerate}fps";
-                g.DrawString(str, Font, Brushes.Black, (borders.Width - g.MeasureString(str, Font).Width) / 2, 0);
-                str = $"Size: {Size} => {Size.Width * Size.Height}";
-                g.DrawString(str, Font, Brushes.Black, (borders.Width - g.MeasureString(str, Font).Width) / 2, Font.Height);
+                g.DrawString(str, Font, Brushes.Black, (borders.Width - g.MeasureString(str, Font).Width) / 2, Font.Height * 0);
+                str = $"Simulation: {msSimulation}ms";
+                g.DrawString(str, Font, Brushes.Black, (borders.Width - g.MeasureString(str, Font).Width) / 2, Font.Height * 1);
                 str = $"CalculateColors: {{Allocate: {msAllocate}ms | LoadTo: {msLoadTo}ms | Execute: {msExecute}ms | LoadFrom: {msLoadFrom}ms | total: {msCalculateColors}ms }}";
                 g.DrawString(str, Font, Brushes.Black, (borders.Width - g.MeasureString(str, Font).Width) / 2, Font.Height * 2);
                 str = $"Bitmap: {msBitmap}ms";
                 g.DrawString(str, Font, Brushes.Black, (borders.Width - g.MeasureString(str, Font).Width) / 2, Font.Height * 3);
-                g.DrawString(Color.FromArgb(colors[0]).ToString(), Font, Brushes.Black, 0, 0);
+
+                g.DrawString($"Size: {Size} => Area: {Size.Width * Size.Height}", Font, Brushes.Black, 0, Font.Height * 0);
+                g.DrawString($"[SPACE] to open/close help-display", Font, Brushes.Black, 0, Font.Height * 1);
             }
         }
 
-        private Bitmap ArrayToBitmap(int[] data, int width, int height)
+        private Bitmap ArrayToBitmap(int[] data, int width, int height)//Mostly AI
         {
             Bitmap bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
             BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, bmp.PixelFormat);
