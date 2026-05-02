@@ -66,6 +66,7 @@ namespace ColorPointsOptimization
             }
 
             if (keyData == Keys.Space) { display = !display; return true; }
+            if (keyData == Keys.R) { _colorPointContainer.ResetPosVel(); return true; }
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
@@ -117,6 +118,7 @@ namespace ColorPointsOptimization
 
                 g.DrawString($"Size: {Size} => Area: {Size.Width * Size.Height}", Font, Brushes.Black, 0, Font.Height * 0);
                 g.DrawString($"[SPACE] to open/close help-display", Font, Brushes.Black, 0, Font.Height * 1);
+                g.DrawString($"[R] to reset positions and velocities", Font, Brushes.Black, 0, Font.Height * 2);
             }
         }
 

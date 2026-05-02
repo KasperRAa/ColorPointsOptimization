@@ -28,7 +28,6 @@ namespace ColorPointsOptimization_Library
         public ColorPointsContainer(RectangleF container, int colorPointCount, float speedFactor) : this(container.Location, container.Size, colorPointCount, speedFactor) { }
         public ColorPointsContainer(PointF position, SizeF size, int colorPointCount, float speedFactor)
         {
-            Random rng = new Random(0);
             Position = position;
             Size = size;
 
@@ -43,17 +42,26 @@ namespace ColorPointsOptimization_Library
             {
                 float rgb = rgbFactor * i;
                 _colors[i] = ((int)rgb) - 16777216;
-                _points[i].X = rng.Next(0, (int)Size.Width);
-                _points[i].Y = rng.Next(0, (int)Size.Height);
-                _velocities[i] = new Vector2((float)rng.NextDouble() - 0.5f, (float)rng.NextDouble() - 0.5f);
-                _velocities[i] = Vector2.Normalize(_velocities[i]);
             }
+            ResetPosVel();
 
             Context context = Context.CreateDefault();
             _accelerator = context.GetPreferredDevice(false).CreateAccelerator(context);
             _kernel_TakeStep = _accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<PointF>, ArrayView<Vector2>, SizeF, float, float>(AddKernel_TakeStep);
 
             _speedFactor = speedFactor;
+        }
+        
+        public void ResetPosVel()
+        {
+            Random rng = new Random();
+            for (int i = 0; i < _count; i++)
+            {
+                _points[i].X = rng.Next(0, (int)Size.Width);
+                _points[i].Y = rng.Next(0, (int)Size.Height);
+                _velocities[i] = new Vector2((float)rng.NextDouble() - 0.5f, (float)rng.NextDouble() - 0.5f);
+                _velocities[i] = Vector2.Normalize(_velocities[i]);
+            }
         }
 
         public void TakeStep(float deltaTime)
